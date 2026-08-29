@@ -3,46 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omnipay</title>
+    <title>Omnipay SuperApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 16px; color: #333; }
-        .card { background: #fff; padding: 20px; border-radius: 12px; max-width: 320px; margin: 40px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .app-view { display: none; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
+        body { background: #f4f6f8; padding: 16px; color: #1f2937; }
+        .card { background: #fff; padding: 20px; border-radius: 14px; max-width: 360px; margin: 20px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .btn { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .app-view { display: none; max-width: 400px; margin: 0 auto; padding-bottom: 30px; }
+        
+        .wallet-box { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white; padding: 18px; border-radius: 12px; margin: 15px 0; text-align: left; }
+        .section-title { font-size: 13px; font-weight: 600; color: #4b5563; margin: 16px 0 8px 0; text-align: left; }
+        
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .grid-item { background: white; padding: 12px 6px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .grid-item span { font-size: 20px; display: block; margin-bottom: 4px; }
+        .grid-item p { font-size: 10px; color: #374151; font-weight: 500; }
+
+        .popup-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .popup-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <!-- Login Box -->
     <div id="loginBox" class="card">
         <h2>Omnipay Login</h2>
         <input type="tel" placeholder="Mobile Number" id="mob">
         <input type="password" placeholder="PIN / Password" id="pwd">
-        <button onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('mainApp').style.display='block';">Login / Fingerprint</button>
+        <button class="btn" onclick="loginSuccess()">Login / Fingerprint</button>
     </div>
 
-    <!-- Main App View -->
     <div id="mainApp" class="app-view">
-        <h2 style="color: #2563eb;">Omnipay SuperApp</h2>
-        <div style="background: #2563eb; color: white; padding: 15px; border-radius: 10px; margin: 15px 0;">
-            Wallet Balance: <b>₹12,450.00</b>
-        </div>
-        
-        <h3>Services</h3>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
-            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">📱 Recharge</div>
-            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">💡 EB Bill</div>
-            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">🚌 Bus / Train</div>
-            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">🪙 Gold Live</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="color: #2563eb; font-size: 18px;">Omnipay SuperApp</h2>
+            <button onclick="logoutApp()" style="background: #fee2e2; color: #dc2626; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">Logout</button>
         </div>
 
-        <button style="background: #dc2626; margin-top: 20px;" onclick="document.getElementById('mainApp').style.display='none'; document.getElementById('loginBox').style.display='block';">Logout</button>
+        <div class="wallet-box">
+            <p style="font-size: 12px; opacity: 0.9;">Wallet Balance</p>
+            <h1 style="font-size: 24px; margin-top: 4px;">₹12,450.00</h1>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div onclick="openService('Rewards & Scratch Cards')" style="flex: 1; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px; border-radius: 10px; cursor: pointer; text-align: left;">
+                <h4 style="font-size: 12px;">🎁 Rewards</h4>
+                <p style="font-size: 10px; opacity: 0.9;">3 Cards Waiting</p>
+            </div>
+            <div onclick="openService('Gold & Silver Rates: Gold ₹7,150/g | Silver ₹92/g')" style="flex: 1; background: white; padding: 12px; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); text-align: left;">
+                <h4 style="font-size: 12px; color: #111827;">🪙 Gold Live</h4>
+                <p style="font-size: 10px; color: #6b7280;" id="goldText">₹7,150/g</p>
+            </div>
+        </div>
+
+        <div class="section-title">Recharges & Bills</div>
+        <div class="grid-4">
+            <div class="grid-item" onclick="openService('Mobile Recharge')"><span>📱</span><p>Recharge</p></div>
+            <div class="grid-item" onclick="openService('EB Bill Payment')"><span>💡</span><p>EB Bill</p></div>
+            <div class="grid-item" onclick="openService('DTH Recharge')"><span>📺</span><p>DTH</p></div>
+            <div class="grid-item" onclick="openService('Pharmacy Order')"><span>💊</span><p>Pharmacy</p></div>
+        </div>
+
+        <div class="section-title">Travel & Tickets</div>
+        <div class="grid-4">
+            <div class="grid-item" onclick="openService('Bus Ticket Booking')"><span>🚌</span><p>Bus</p></div>
+            <div class="grid-item" onclick="openService('Train Ticket Booking')"><span>🚆</span><p>Train</p></div>
+            <div class="grid-item" onclick="openService('Hotel Booking')"><span>🏨</span><p>Hotel</p></div>
+            <div class="grid-item" onclick="openService('Movie Ticket Booking')"><span>🎟️</span><p>Movies</p></div>
+        </div>
+
+        <div class="section-title">Financial & Loans</div>
+        <div class="grid-4">
+            <div class="grid-item" onclick="openService('Loan Repayment')"><span>💳</span><p>Loan Repay</p></div>
+            <div class="grid-item" onclick="openService('Digital Gold')"><span>🪙</span><p>Digi Gold</p></div>
+            <div class="grid-item" onclick="openService('Investments')"><span>📊</span><p>Invest</p></div>
+            <div class="grid-item" onclick="openService('Insurance')"><span>🛡️</span><p>Insurance</p></div>
+        </div>
+    </div>
+
+    <div id="serviceModal" class="popup-modal">
+        <div class="popup-content">
+            <h3 id="modalTitle" style="color: #2563eb; margin-bottom: 10px;">Service</h3>
+            <p id="modalDesc" style="font-size: 13px; color: #4b5563; margin-bottom: 15px;">Opening service portal...</p>
+            <button class="btn" onclick="closeService()">Close</button>
+        </div>
     </div>
 
     <script>
         window.Telegram.WebApp.expand();
+
+        function loginSuccess() {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+        }
+
+        function logoutApp() {
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'block';
+        }
+
+        function openService(serviceName) {
+            document.getElementById('modalTitle').innerText = serviceName;
+            document.getElementById('modalDesc').innerText = "You clicked on " + serviceName + ". Gateway connected successfully!";
+            document.getElementById('serviceModal').style.display = 'flex';
+        }
+
+        function closeService() {
+            document.getElementById('serviceModal').style.display = 'none';
+        }
     </script>
 </body>
 </html>
