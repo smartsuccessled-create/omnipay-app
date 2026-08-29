@@ -3,22 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omnipay - UPI & Payments</title>
+    <title>Omnipay SuperApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-
         body {
             background-color: #f4f6f8;
             color: #1f2937;
             padding-bottom: 70px;
         }
+        .screen { display: none; padding: 16px; }
+        .screen.active { display: block; }
+        
+        /* Auth Styles */
+        .auth-container {
+            max-width: 360px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .auth-container h2 { margin-bottom: 16px; color: #111827; }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .primary-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
 
+        /* Dashboard Header */
         .header {
             background: #ffffff;
             padding: 16px;
@@ -27,164 +61,55 @@
             align-items: center;
             border-bottom: 1px solid #e5e7eb;
         }
-
-        .user-info h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .user-info p {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .settings-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .container {
-            padding: 16px;
-        }
-
-        /* Wallet / Balance Section */
         .balance-card {
             background: linear-gradient(135deg, #1d4ed8, #2563eb);
             color: white;
-            padding: 20px;
+            padding: 18px;
             border-radius: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 16px 0;
         }
+        .balance-card h3 { font-size: 13px; opacity: 0.9; font-weight: 400; }
+        .balance-card h1 { font-size: 26px; font-weight: 700; margin-top: 4px; }
 
-        .balance-card h3 {
-            font-size: 14px;
-            font-weight: 400;
-            opacity: 0.9;
-        }
-
-        .balance-card h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-top: 6px;
-        }
-
-        /* Quick Actions Grid (GPay Style) */
+        /* Services Grid */
         .section-title {
             font-size: 14px;
             font-weight: 600;
             color: #4b5563;
-            margin-bottom: 12px;
+            margin: 16px 0 10px 0;
         }
-
         .services-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 10px;
         }
-
         .service-item {
             background: #ffffff;
-            padding: 14px 8px;
+            padding: 12px 4px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
             cursor: pointer;
         }
+        .service-item span { font-size: 22px; display: block; margin-bottom: 4px; }
+        .service-item p { font-size: 10px; color: #374151; font-weight: 500; }
 
-        .service-item span {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .service-item p {
-            font-size: 11px;
-            color: #374151;
-            font-weight: 500;
-        }
-
-        /* Scan & Pay Banner */
-        .scan-banner {
+        /* Gold & Silver / Rewards Cards */
+        .info-card {
             background: #ffffff;
-            border: 1px solid #e5e7eb;
-            padding: 16px;
-            border-radius: 14px;
+            padding: 14px;
+            border-radius: 12px;
+            margin-top: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .scan-text h4 {
-            font-size: 15px;
-            color: #111827;
-            font-weight: 600;
-        }
-
-        .scan-text p {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 2px;
-        }
-
-        .scan-btn {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        /* Recent Transactions */
-        .transactions-section {
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
-
-        .tx-info h5 {
-            font-size: 13px;
-            color: #111827;
-        }
-
-        .tx-info p {
-            font-size: 11px;
-            color: #9ca3af;
-        }
-
-        .tx-amount {
-            font-size: 13px;
-            font-weight: 600;
-            color: #dc2626;
-        }
-
-        /* Bottom Navigation Bar */
+        /* Bottom Nav */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
+            bottom: 0; left: 0;
             width: 100%;
             background: #ffffff;
             border-top: 1px solid #e5e7eb;
@@ -193,114 +118,125 @@
             padding: 10px 0;
             z-index: 100;
         }
-
         .nav-item {
             text-align: center;
             text-decoration: none;
             color: #9ca3af;
             font-size: 10px;
+            cursor: pointer;
         }
-
-        .nav-item.active {
-            color: #2563eb;
-        }
-
-        .nav-item span {
-            display: block;
-            font-size: 18px;
-        }
+        .nav-item.active { color: #2563eb; }
+        .nav-item span { display: block; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="user-info">
-            <h2 id="username">Hello, Aruvi</h2>
-            <p>Secure UPI & Payments</p>
+    <!-- 1. AUTH SCREEN (Signup / Login) -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <h2>Omnipay Welcome</h2>
+            <input type="text" id="mobileInput" class="input-field" placeholder="Enter Mobile Number">
+            <input type="password" id="passInput" class="input-field" placeholder="Enter Password / PIN">
+            <button class="primary-btn" onclick="loginApp()">Login / Register</button>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 12px;">Or Quick Login via Biometric</p>
+            <button class="primary-btn" style="background: #059669;" onclick="loginApp()">🔒 Fingerprint Login</button>
         </div>
-        <button class="settings-btn">⚙️</button>
     </div>
 
-    <div class="container">
-        
-        <div class="balance-card">
-            <h3>Omnipay Wallet Balance</h3>
-            <h1>₹5,420.00</h1>
+    <!-- 2. MAIN DASHBOARD SCREEN -->
+    <div id="mainScreen" class="screen">
+        <div class="header">
+            <div>
+                <h2 id="username" style="font-size: 16px; font-weight: 600;">Hello, Aruvi</h2>
+                <p style="font-size: 11px; color: #6b7280;">Secure Payments & Services</p>
+            </div>
+            <button onclick="logout()" style="background: #fee2e2; color: #dc2626; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Logout</button>
         </div>
 
-        <div class="scan-banner">
-            <div class="scan-text">
-                <h4>Fast Scan & Pay</h4>
-                <p>Scan any QR code to pay instantly</p>
+        <div style="padding: 0 4px;">
+            <!-- Wallet Balance -->
+            <div class="balance-card">
+                <h3>Omnipay Balance</h3>
+                <h1>₹12,450.00</h1>
             </div>
-            <button class="scan-btn">Scan QR</button>
-        </div>
 
-        <div class="section-title">Recharge & Bill Payments</div>
-        <div class="services-grid">
-            <div class="service-item">
-                <span>📱</span>
-                <p>Recharge</p>
-            </div>
-            <div class="service-item">
-                <span>💡</span>
-                <p>Bills</p>
-            </div>
-            <div class="service-item">
-                <span>🚌</span>
-                <p>Bus</p>
-            </div>
-            <div class="service-item">
-                <span>🚆</span>
-                <p>Train</p>
-            </div>
-        </div>
-
-        <div class="section-title">Recent History</div>
-        <div class="transactions-section">
-            <div class="transaction-item">
-                <div class="tx-info">
-                    <h5>Mobile Recharge (Jio)</h5>
-                    <p>Today, 10:45 AM</p>
+            <!-- Rewards Section -->
+            <div class="info-card" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+                <div>
+                    <h4 style="font-size: 13px;">🎁 Rewards & Scratch Cards</h4>
+                    <p style="font-size: 11px; opacity: 0.9;">You have 3 scratch cards waiting!</p>
                 </div>
-                <div class="tx-amount">-₹299</div>
+                <button style="background: white; color: #d97706; border: none; padding: 6px 10px; border-radius: 6px; font-weight: 600; font-size: 11px;">Claim</button>
             </div>
-            <div class="transaction-item">
-                <div class="tx-info">
-                    <h5>Electricity Bill</h5>
-                    <p>Yesterday</p>
+
+            <!-- Gold & Silver Live Rates API Section -->
+            <div class="info-card">
+                <div>
+                    <h4 style="font-size: 13px; color: #111827;">🪙 Gold & Silver Live</h4>
+                    <p style="font-size: 11px; color: #6b7280;" id="metalRates">Loading live rates...</p>
                 </div>
-                <div class="tx-amount" style="color: #dc2626;">-₹650</div>
+                <span style="font-size: 20px;">📈</span>
+            </div>
+
+            <!-- Bill Payments & Recharges -->
+            <div class="section-title">Recharge & Bills</div>
+            <div class="services-grid">
+                <div class="service-item"><span>📱</span><p>Recharge</p></div>
+                <div class="service-item"><span>💡</span><p>EB Bill</p></div>
+                <div class="service-item"><span>📺</span><p>DTH</p></div>
+                <div class="service-item"><span>💊</span><p>Pharmacy</p></div>
+            </div>
+
+            <!-- Travel & Tickets -->
+            <div class="section-title">Travel & Entertainment</div>
+            <div class="services-grid">
+                <div class="service-item"><span>🚌</span><p>Bus</p></div>
+                <div class="service-item"><span>🚆</span><p>Train</p></div>
+                <div class="service-item"><span>🏨</span><p>Hotel</p></div>
+                <div class="service-item"><span>🎟️</span><p>Movies</p></div>
+            </div>
+
+            <!-- Financial Services -->
+            <div class="section-title">Financial Services</div>
+            <div class="services-grid">
+                <div class="service-item"><span>💳</span><p>Loan Repay</p></div>
+                <div class="service-item"><span>🪙</span><p>Digital Gold</p></div>
+                <div class="service-item"><span>📊</span><p>Investments</p></div>
+                <div class="service-item"><span>🛡️</span><p>Insurance</p></div>
             </div>
         </div>
-
     </div>
 
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
-        <a href="#" class="nav-item active">
-            <span>🏠</span>
-            Home
-        </a>
-        <a href="#" class="nav-item">
-            <span>📊</span>
-            History
-        </a>
-        <a href="#" class="nav-item">
-            <span>👤</span>
-            Profile
-        </a>
+        <a class="nav-item active"><span>🏠</span>Home</a>
+        <a class="nav-item"><span>🎁</span>Rewards</a>
+        <a class="nav-item"><span>📜</span>History</a>
+        <a class="nav-item"><span>👤</span>Profile</a>
     </div>
 
     <script>
-        // Telegram WebApp Initialization
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Optional: If user name is available from Telegram
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('username').innerText = "Hello, " + tg.initDataUnsafe.user.first_name;
+        function loginApp() {
+            document.getElementById('authScreen').classList.remove('active');
+            document.getElementById('mainScreen').classList.add('active');
+            fetchGoldSilverRates();
+        }
+
+        function logout() {
+            document.getElementById('mainScreen').classList.remove('active');
+            document.getElementById('authScreen').classList.add('active');
+        }
+
+        // Simulating Gold & Silver Live API Fetch
+        function fetchGoldSilverRates() {
+            // Mocking live API data for demonstration
+            setTimeout(() => {
+                document.getElementById('metalRates').innerText = "Gold: ₹7,150/g | Silver: ₹92/g";
+            }, 500);
         }
     </script>
 </body>
-    </html>
-    
+</html>
