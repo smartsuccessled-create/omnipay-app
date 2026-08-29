@@ -1,594 +1,306 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omnipay SuperApp</title>
+    <title>Omnipay - UPI & Payments</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
+
         body {
-            background-color: #0b0e14;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 10px;
-            padding-bottom: 85px;
+            background-color: #f4f6f8;
+            color: #1f2937;
+            padding-bottom: 70px;
         }
-        .container {
-            width: 100%;
-            max-width: 450px;
-            background: #121622;
-            border-radius: 16px;
+
+        .header {
+            background: #ffffff;
             padding: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
-            margin-bottom: 15px;
-            border: 1px solid #1e2638;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
         }
-        .app-header {
+
+        .user-info h2 {
             font-size: 18px;
-            font-weight: bold;
-            color: #ffffff;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-weight: 600;
+            color: #111827;
         }
-        .header-right-btns {
-            display: flex;
-            gap: 8px;
-            align-items: center;
+
+        .user-info p {
+            font-size: 12px;
+            color: #6b7280;
         }
-        .settings-btn, .auth-btn {
-            background: #1e2638;
-            color: #4da6ff;
-            border: 1px solid #2a3650;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .welcome-box {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-        .top-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .mini-card {
-            background: #171f30;
-            border: 1px solid #222d44;
-            border-radius: 12px;
-            padding: 12px 8px;
-            text-align: center;
+
+        .settings-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
             cursor: pointer;
         }
-        .mini-card h4 {
-            font-size: 16px;
-            color: #ffffff;
-            margin-bottom: 4px;
+
+        .container {
+            padding: 16px;
         }
-        .mini-card p {
-            font-size: 10px;
-            color: #94a3b8;
-            line-height: 1.2;
+
+        /* Wallet / Balance Section */
+        .balance-card {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        .utility-banner {
-            background: linear-gradient(135deg, #1d1b38 0%, #171f30 100%);
-            border: 1px solid #2a3650;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .utility-banner h3 {
+
+        .balance-card h3 {
             font-size: 14px;
-            color: #ffffff;
-            margin-bottom: 4px;
+            font-weight: 400;
+            opacity: 0.9;
         }
-        .utility-banner p {
-            font-size: 11px;
-            color: #94a3b8;
+
+        .balance-card h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 6px;
         }
-        .upgrade-btn {
-            background: #232b3e;
-            color: #ffffff;
-            border: 1px solid #323f5c;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .section-box {
-            display: none !important;
-        }
-        .section-box.active {
-            display: block !important;
-        }
-        .wallet-card {
-            background: #171f30;
-            border: 1px solid #222d44;
-            border-radius: 12px;
-            padding: 15px;
+
+        /* Quick Actions Grid (GPay Style) */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
             margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
         }
-        .crypto-info h4 {
-            font-size: 14px;
-            color: #ffffff;
-        }
-        .crypto-info p {
-            font-size: 11px;
-            color: #94a3b8;
-        }
-        .crypto-balance {
-            text-align: right;
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffffff;
-        }
-        .crypto-balance span {
-            font-size: 10px;
-            color: #94a3b8;
-            display: block;
-        }
-        
-        /* Quick Services Grid (Paytm Style) */
+
         .services-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
+
         .service-item {
-            background: #171f30;
-            border: 1px solid #222d44;
+            background: #ffffff;
+            padding: 14px 8px;
             border-radius: 12px;
-            padding: 12px 5px;
             text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             cursor: pointer;
         }
-        .service-icon {
-            font-size: 20px;
-            margin-bottom: 5px;
+
+        .service-item span {
+            font-size: 24px;
             display: block;
-        }
-        .service-item span:last-child {
-            font-size: 10px;
-            color: #94a3b8;
-            display: block;
+            margin-bottom: 6px;
         }
 
-        /* Presale Box Styles */
-        .presale-box {
-            background: #171f30;
-            border: 1px solid #222d44;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-        }
-        .currency-select-group {
-            display: flex;
-            background: #0b0e14;
-            border: 1px solid #2a3650;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-        .currency-select-group select {
-            background: #1e2638;
-            color: #4da6ff;
-            border: none;
-            padding: 10px;
-            font-size: 12px;
-            font-weight: bold;
-            outline: none;
-            cursor: pointer;
-        }
-        .currency-select-group input {
-            width: 100%;
-            padding: 10px;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 13px;
-            text-align: right;
-            outline: none;
-            padding-right: 12px;
-        }
-        .token-calc-text {
-            font-size: 12px;
-            color: #4da6ff;
-            margin-bottom: 12px;
-            font-weight: bold;
+        .service-item p {
+            font-size: 11px;
+            color: #374151;
+            font-weight: 500;
         }
 
-        /* Modal Style */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: #121622;
-            border: 1px solid #2a3650;
-            padding: 20px;
+        /* Scan & Pay Banner */
+        .scan-banner {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            padding: 16px;
             border-radius: 14px;
-            width: 85%;
-            max-width: 320px;
-            text-align: center;
-        }
-        .modal-content h3 {
-            color: #4da6ff;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        .modal-content p {
-            color: #94a3b8;
-            font-size: 12px;
-            margin-bottom: 15px;
-        }
-        .modal-content input {
-            width: 100%;
-            padding: 10px;
-            background: #0b0e14;
-            border: 1px solid #2a3650;
-            border-radius: 8px;
-            color: #fff;
-            margin-bottom: 10px;
-            font-size: 12px;
-        }
-        .close-modal {
-            background: #232b3e;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        /* Bottom Navigation Bar (6 Items) */
-        .nav-footer {
+        .scan-text h4 {
+            font-size: 15px;
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .scan-text p {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .scan-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Recent Transactions */
+        .transactions-section {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .tx-info h5 {
+            font-size: 13px;
+            color: #111827;
+        }
+
+        .tx-info p {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .tx-amount {
+            font-size: 13px;
+            font-weight: 600;
+            color: #dc2626;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
             width: 100%;
-            max-width: 450px;
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 2px;
-            background: #121622;
-            border-top: 1px solid #1e2638;
-            padding: 8px 2px;
-            text-align: center;
-            font-size: 9px;
-            color: #94a3b8;
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
             z-index: 100;
         }
+
         .nav-item {
-            cursor: pointer;
-            padding: 4px 1px;
-            border-radius: 6px;
+            text-align: center;
+            text-decoration: none;
+            color: #9ca3af;
+            font-size: 10px;
         }
+
         .nav-item.active {
-            color: #4da6ff;
-            font-weight: bold;
-            background: #1a2338;
+            color: #2563eb;
         }
-        .nav-icon {
-            font-size: 15px;
-            margin-bottom: 2px;
+
+        .nav-item span {
             display: block;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Header -->
-    <div class="app-header">
-        <span id="pageTitle">Omnipay SuperApp</span>
-        <div class="header-right-btns">
-            <button class="auth-btn" onclick="openAuthModal()">Login</button>
-            <button class="settings-btn" onclick="showComingSoon()">⚙️</button>
+    <div class="header">
+        <div class="user-info">
+            <h2 id="username">Hello, Aruvi</h2>
+            <p>Secure UPI & Payments</p>
         </div>
+        <button class="settings-btn">⚙️</button>
     </div>
 
-    <!-- 1. DASHBOARD SECTION (Paytm Style Quick Services) -->
-    <div id="Dashboard-section" class="section-box active">
-        <div class="welcome-box" id="userWelcome">
-            Welcome to Omnipay! Your all-in-one payment & utility wallet.
-        </div>
-
-        <!-- Quick Services Grid -->
-        <div class="services-grid">
-            <div class="service-item" onclick="showComingSoon()">
-                <span class="service-icon">📱</span>
-                <span>Recharge</span>
-            </div>
-            <div class="service-item" onclick="showComingSoon()">
-                <span class="service-icon">💡</span>
-                <span>Bills</span>
-            </div>
-            <div class="service-item" onclick="switchNav(document.getElementById('travelNav'), 'Travel')">
-                <span class="service-icon">🚌</span>
-                <span>Bus</span>
-            </div>
-            <div class="service-item" onclick="switchNav(document.getElementById('travelNav'), 'Travel')">
-                <span class="service-icon">🚆</span>
-                <span>Train</span>
-            </div>
-        </div>
-
-        <div class="top-cards-grid">
-            <div class="mini-card" onclick="showComingSoon()">
-                <h4>₹0.00</h4>
-                <p>Wallet Balance</p>
-            </div>
-            <div class="mini-card" onclick="showComingSoon()">
-                <h4>135.00</h4>
-                <p>Omni Tokens</p>
-            </div>
-            <div class="mini-card" onclick="showComingSoon()">
-                <h4>$0.00</h4>
-                <p>Estimate</p>
-            </div>
-        </div>
-
-        <div class="utility-banner">
-            <div>
-                <h3>Fast Scan & Pay</h3>
-                <p>Scan any QR code instantly</p>
-            </div>
-            <button class="upgrade-btn" onclick="showComingSoon()">Scan QR 📷</button>
-        </div>
-
-        <div class="welcome-box" style="margin-bottom: 8px;">Recent Transactions</div>
-
-        <div class="wallet-card" onclick="showComingSoon()">
-            <div class="crypto-info">
-                <h4>Mobile Recharge (Jio)</h4>
-                <p>Today, 10:45 AM</p>
-            </div>
-            <div class="crypto-balance" style="color: #ff4d4d;">
-                -₹299 <span>Success</span>
-            </div>
-        </div>
-        <div class="wallet-card" onclick="showComingSoon()">
-            <div class="crypto-info">
-                <h4>Presale Claim</h4>
-                <p>Yesterday</p>
-            </div>
-            <div class="crypto-balance" style="color: #4da6ff;">
-                +50.00 <span>OMNI</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. GAME SECTION -->
-    <div id="Game-section" class="section-box">
-        <div class="utility-banner">
-            <div>
-                <h3>Play & Earn Rewards</h3>
-                <p>Complete challenges & win free tokens!</p>
-            </div>
-            <button class="upgrade-btn" onclick="showComingSoon()">Play Now</button>
-        </div>
-    </div>
-
-    <!-- 3. TRAVEL SECTION (Bus & Train Booking) -->
-    <div id="Travel-section" class="section-box">
-        <div class="utility-banner" style="background: linear-gradient(135deg, #1b3832 0%, #171f30 100%);">
-            <div>
-                <h3>🚌 Travel & Tickets</h3>
-                <p>Book Bus & Train tickets instantly with cashback!</p>
-            </div>
-        </div>
-        <div class="wallet-card" onclick="showComingSoon()" style="display: block; text-align: center; padding: 20px;">
-            <h4 style="color: #4da6ff; margin-bottom: 8px;">Bus Ticket Booking</h4>
-            <p style="font-size: 11px; color: #94a3b8; margin-bottom: 12px;">Compare prices & book AC/Non-AC buses.</p>
-            <button class="upgrade-btn" style="width: 100%; background: #1e2638;">Book Bus Ticket</button>
-        </div>
-        <div class="wallet-card" onclick="showComingSoon()" style="display: block; text-align: center; padding: 20px;">
-            <h4 style="color: #4da6ff; margin-bottom: 8px;">Train Ticket Booking (IRCTC)</h4>
-            <p style="font-size: 11px; color: #94a3b8; margin-bottom: 12px;">Check seat availability & book train tickets.</p>
-            <button class="upgrade-btn" style="width: 100%; background: #1e2638;">Book Train Ticket</button>
-        </div>
-    </div>
-
-    <!-- 4. EARN SECTION -->
-    <div id="Earn-section" class="section-box">
-        <div class="utility-banner">
-            <div>
-                <h3>Paid to Click (PTC)</h3>
-                <p>Watch ads and earn rewards instantly</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. PRESALE SECTION -->
-    <div id="Presale-section" class="section-box">
-        <div class="utility-banner" style="background: linear-gradient(135deg, #2e1a38 0%, #171f30 100%);">
-            <div>
-                <h3>🔥 Omnipay Token Presale</h3>
-                <p>Stage 1 is Live! Listing Price: ₹25</p>
-            </div>
-        </div>
-        <div class="presale-box">
-            <p style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">1 OMNI = ₹8.00 (Stage 1)</p>
-            <p style="font-size: 11px; color: #4da6ff; margin-bottom: 8px;">Listing Price = ₹25.00</p>
-            <h4 style="color: #4da6ff; margin-bottom: 12px; font-size: 15px;">Soft Cap: ₹4,150,000 / ₹1,033,350 Raised</h4>
-            
-            <div class="currency-select-group">
-                <select id="currencySelect" onchange="calculateTokens()">
-                    <option value="INR">INR (₹)</option>
-                    <option value="USDT">USDT ($)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                </select>
-                <input type="number" id="amountInput" placeholder="Enter amount" oninput="calculateTokens()">
-            </div>
-
-            <div class="token-calc-text" id="tokenResult">You will get: 0 OMNI</div>
-
-            <button class="upgrade-btn" style="width: 100%; padding: 12px; background: #4da6ff; color: #000; font-size: 13px;" onclick="showComingSoon()">Buy Presale Tokens</button>
-        </div>
-    </div>
-
-    <!-- 6. AFFILIATE SECTION -->
-    <div id="Affiliate-section" class="section-box">
-        <div class="utility-banner">
-            <div>
-                <h3>Affiliate Program</h3>
-                <p>Invite friends and earn 50% commission</p>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- Bottom Navigation Bar (6 Items) -->
-<div class="nav-footer">
-    <div class="nav-item" onclick="switchNav(this, 'Game')">
-        <span class="nav-icon">🎮</span>
-        Game
-    </div>
-    <div class="nav-item active" onclick="switchNav(this, 'Dashboard')">
-        <span class="nav-icon">📊</span>
-        Dashboard
-    </div>
-    <div class="nav-item" id="travelNav" onclick="switchNav(this, 'Travel')">
-        <span class="nav-icon">🚌</span>
-        Travel
-    </div>
-    <div class="nav-item" onclick="switchNav(this, 'Earn')">
-        <span class="nav-icon">😊</span>
-        Earn
-    </div>
-    <div class="nav-item" onclick="switchNav(this, 'Presale')">
-        <span class="nav-icon">🚀</span>
-        Presale
-    </div>
-    <div class="nav-item" onclick="switchNav(this, 'Affiliate')">
-        <span class="nav-icon">🔗</span>
-        Affiliate
-    </div>
-</div>
-
-<!-- Coming Soon Modal -->
-<div id="comingSoonModal" class="modal">
-    <div class="modal-content">
-        <h3>Coming Soon! 🚀</h3>
-        <p>This feature is under development and will be available soon.</p>
-        <button class="close-modal" onclick="closeModal()">OK</button>
-    </div>
-</div>
-
-<!-- Login / Signup Modal -->
-<div id="authModal" class="modal">
-    <div class="modal-content">
-        <h3>Login / Signup</h3>
-        <p>Enter your details to access your account.</p>
-        <input type="email" placeholder="Enter your email">
-        <input type="password" placeholder="Enter password">
-        <button class="close-modal" style="width: 100%; margin-bottom: 8px; background: #4da6ff; color: #000;" onclick="submitAuth()">Submit</button>
-        <button class="close-modal" onclick="closeAuthModal()" style="width: now; width: 100%;">Cancel</button>
-    </div>
-</div>
-
-<script>
-    let tg = window.Telegram.WebApp;
-    tg.expand();
-
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        let userName = tg.initDataUnsafe.user.first_name || "User";
-        document.getElementById('userWelcome').textContent = "Welcome back, " + userName + "! Your all-in-one Omnipay wallet.";
-    }
-
-    function switchNav(element, sectionName) {
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        if(element) element.classList.add('active');
-
-        document.querySelectorAll('.section-box').forEach(sec => {
-            sec.classList.remove('active');
-        });
+    <div class="container">
         
-        let targetSection = document.getElementById(sectionName + '-section');
-        if (targetSection) {
-            targetSection.classList.add('active');
+        <div class="balance-card">
+            <h3>Omnipay Wallet Balance</h3>
+            <h1>₹5,420.00</h1>
+        </div>
+
+        <div class="scan-banner">
+            <div class="scan-text">
+                <h4>Fast Scan & Pay</h4>
+                <p>Scan any QR code to pay instantly</p>
+            </div>
+            <button class="scan-btn">Scan QR</button>
+        </div>
+
+        <div class="section-title">Recharge & Bill Payments</div>
+        <div class="services-grid">
+            <div class="service-item">
+                <span>📱</span>
+                <p>Recharge</p>
+            </div>
+            <div class="service-item">
+                <span>💡</span>
+                <p>Bills</p>
+            </div>
+            <div class="service-item">
+                <span>🚌</span>
+                <p>Bus</p>
+            </div>
+            <div class="service-item">
+                <span>🚆</span>
+                <p>Train</p>
+            </div>
+        </div>
+
+        <div class="section-title">Recent History</div>
+        <div class="transactions-section">
+            <div class="transaction-item">
+                <div class="tx-info">
+                    <h5>Mobile Recharge (Jio)</h5>
+                    <p>Today, 10:45 AM</p>
+                </div>
+                <div class="tx-amount">-₹299</div>
+            </div>
+            <div class="transaction-item">
+                <div class="tx-info">
+                    <h5>Electricity Bill</h5>
+                    <p>Yesterday</p>
+                </div>
+                <div class="tx-amount" style="color: #dc2626;">-₹650</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <span>🏠</span>
+            Home
+        </a>
+        <a href="#" class="nav-item">
+            <span>📊</span>
+            History
+        </a>
+        <a href="#" class="nav-item">
+            <span>👤</span>
+            Profile
+        </a>
+    </div>
+
+    <script>
+        // Telegram WebApp Initialization
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Optional: If user name is available from Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('username').innerText = "Hello, " + tg.initDataUnsafe.user.first_name;
         }
-
-        document.getElementById('pageTitle').textContent = sectionName === 'Dashboard' ? 'Omnipay SuperApp' : sectionName;
-    }
-
-    function calculateTokens() {
-        let currency = document.getElementById('currencySelect').value;
-        let amount = parseFloat(document.getElementById('amountInput').value) ||0;
-        let inrAmount = amount;
-
-        if (currency === 'USDT' || currency === 'USD') {
-            inrAmount = amount * 83.0;
-        } else if (currency === 'EUR') {
-            inrAmount = amount * 90.0;
-        } else if (currency === 'GBP') {
-            inrAmount = amount * 105.0;
-        }
-
-        let tokenPriceINR = 8.0;
-        let totalTokens = inrAmount / tokenPriceINR;
-
-        document.getElementById('tokenResult').textContent = "You will get: " + totalTokens.toLocaleString(undefined, {maximumFractionDigits: 2}) + " OMNI";
-    }
-
-    function showComingSoon() {
-        document.getElementById('comingSoonModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('comingSoonModal').style.display = 'none';
-    }
-
-    function openAuthModal() {
-        document.getElementById('authModal').style.display = 'flex';
-    }
-
-    function closeAuthModal() {
-        document.getElementById('authModal').style.display = 'none';
-    }
-
-    function submitAuth() {
-        alert("Login/Signup feature coming soon!");
-        closeAuthModal();
-    }
-</script>
-
+    </script>
 </body>
-  </html>
-          
+    </html>
+    
