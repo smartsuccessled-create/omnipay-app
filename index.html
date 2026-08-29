@@ -3,6 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnipay Partner Portal</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
+        body { background: #f4f6f8; padding: 14px; color: #1f2937; padding-bottom: 50px; }
+        .card { background: #fff; padding: 20px; border-radius: 14px; max-width: 360px; margin: 40px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; background: #fff; }
+        .btn { width: 100%; padding: 12px; background: #059669; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .app-view { display: none; max-width: 400px; margin: 0 auto; }
+        
+        .wallet-box { background: linear-gradient(135deg, #047857, #059669); color: white; padding: 16px; border-radius: 14px; margin: 12px 0; text-align: left; }
+        
+        .pay-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: white; padding: 14px 8px; border-radius: 14px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .pay-item { text-align: center; cursor: pointer; }
+        .pay-item span { font-size: 22px; display: block; margin-bottom: 4px; }
+        .pay-item p { font-size: 10px; color: #374151; font-weight: 600; }
+
+        .section-title { font-size: 13px; font-weight: 600; color: #4b5563; margin: 14px 0 8px 0; text-align: left; }
+        
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .grid-item { background: white; padding: 12px 4px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04); position: relative; }
+        .grid-item span { font-size: 20px; display: block; margin-bottom: 4px; }
+        .grid-item p { font-size: 10px; color: #374151; font-weight: 500; }
+        .commission-badge { position: absolute; top: 2px; right: 2px; background: #dcfce7; color: #166534; font-size: 8px; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
+
+        /* Popup Modals */
+        .popup-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .popup-content { background: white; padding: 20px; border-radius: 14px; width: 90%; max-width: 320px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="loginBox" class="card">
+        <h2>Omnipay Merchant</h2>
+        <input type="tel" placeholder="Mobile Number" id="mob" value="9876543210">
+        <input type="password" placeholder="API Secret / PIN" id="pwd" value="1234">
+        <button class="btn" onclick="loginSuccess()">Merchant Login</button>
+    </div>
+
+    <!-- 2. MAIN APP DASHBOARD -->
+    <div id="mainApp" class="app-view">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="color: #059669; font-size: 17px;">Omnipay Partner Portal</h2>
+            <button onclick="logoutApp()" style="background: #fee2e2; color: #dc2626; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">Logout</button>
+        </div>
+
+        <div class="wallet-box">
+            <p style="font-size: 11px; opacity: 0.9;">Main Wallet & Commission Earned</p>
+            <h1 style="font-size: 24px; margin-top: 4px;" id="walletBalance">₹12,890.00</h1>
+            <p style="font-size: 10px; margin-top: 4px; color: #d1fae5;">⚡ Commission API Connected: Active</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="pay-grid">
+            <div class="pay-item" onclick="triggerApiAction('Scan & Pay API', 0)"><span>📷</span><p>Scan & Pay</p></div>
+            <div class="pay-item" onclick="triggerApiAction('Contact Payout API', 0)"><span>👤</span><p>To Contact</p></div>
+            <div class="pay-item" onclick="triggerApiAction('Bank payout API', 0)"><span>🏦</span><p>Bank/UPI</p></div>
+            <div class="pay-item" onclick="triggerApiAction('Referral Commission', 50)"><span>🎁</span><p>Refer & Earn</p></div>
+        </div>
+
+        <!-- Rewards & Gold API Banners -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div onclick="triggerApiAction('Scratch Card Bonus', 25)" style="flex: 1; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px; border-radius: 10px; cursor: pointer; text-align: left;">
+                <h4 style="font-size: 12px;">🎁 Rewards</h4>
+                <p style="font-size: 10px; opacity: 0.9;">Earn Cashbacks</p>
+            </div>
+            <div onclick="triggerApiAction('Gold Bullion API', 0)" style="flex: 1; background: white; padding: 12px; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); text-align: left;">
+                <h4 style="font-size: 12px; color: #111827;">🪙 Gold Live API</h4>
+                <p style="font-size: 10px; color: #6b7280;">₹7,150/g</p>
+            </div>
+        </div>
+
+        <!-- Services -->
+        <div class="section-title">Recharges & Bills (Commission Enabled)</div>
+        <div class="grid-4">
+            <div class="grid-item" onclick="openRechargeModal()"><span class="commission-badge">+2.5%</span><span>📱</span><p>Recharge</p></div>
+            <div class="grid-item" onclick="triggerApiAction('BBPS Electricity API', 10)"><span class="commission-badge">+₹2</span><span>💡</span><p>EB Bill</p></div>
+            <div class="grid-item" onclick="triggerApiAction('DTH Recharge API', 12)"><span class="commission-badge">+3%</span><span>📺</span><p>DTH</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Pharmacy API', 40)"><span class="commission-badge">+5%</span><span>💊</span><p>Pharmacy</p></div>
+        </div>
+
+        <div class="section-title">Travel & Ticketing APIs</div>
+        <div class="grid-4">
+            <div class="grid-item" onclick="triggerApiAction('Bus Booking API', 50)"><span class="commission-badge">+₹50</span><span>🚌</span><p>Bus</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Train IRCTC API', 30)"><span class="commission-badge">+₹20</span><span>🚆</span><p>Train</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Hotel Booking API', 120)"><span class="commission-badge">+₹100</span><span>🏨</span><p>Hotel</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Movie Booking API', 20)"><span class="commission-badge">+₹10</span><span>🎟️</span><p>Movies</p></div>
+        </div>
+
+        <div class="section-title">Financial & Loan APIs</div>
+        <div class="grid-4">
+            <div class="grid-item" onclick="triggerApiAction('Loan Repayment API', 25)"><span class="commission-badge">+₹15</span><span>💳</span><p>Loan Repay</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Digital Gold API', 15)"><span class="commission-badge">+1%</span><span>🪙</span><p>Digi Gold</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Mutual Fund API', 50)"><span class="commission-badge">+₹40</span><span>📊</span><p>Invest</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Insurance API', 150)"><span class="commission-badge">+₹150</span><span>🛡️</span><p>Insurance</p></div>
+        </div>
+    </div>
+
+    <!-- RECHARGE LIVE MODAL -->
+    <div id="rechargeModal" class="popup-modal">
+        <div class="popup-content">
+            <h3 style="color: #059669; margin-bottom: 8px; font-size: 16px;">📱 Live Mobile Recharge API</h3>
+            <input type="tel" id="rechMobile" placeholder="Enter Mobile Number" maxlength="10">
+            <select id="rechOperator">
+                <option value="Jio">Jio Prepaid</option>
+                <option value="Airtel">Airtel Prepaid</option>
+                <option value="Vi">Vi Prepaid</option>
+                <option value="BSNL">BSNL Prepaid</option>
+            </select>
+            <input type="number" id="rechAmount" placeholder="Enter Amount (e.g. 299)">
+            <p id="rechStatus" style="font-size: 11px; color: #047857; margin: 6px 0; font-weight: bold;"></p>
+            <button class="btn" onclick="processRecharge()">Proceed Recharge (+2.5% Commission)</button>
+            <button class="btn" style="background: #dc2626; margin-top: 6px;" onclick="closeRechargeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- GENERAL POPUP MODAL -->
+    <div id="serviceModal" class="popup-modal">
+        <div class="popup-content">
+            <h3 id="modalTitle" style="color: #059669; margin-bottom: 8px; font-size: 16px;">API Gateway</h3>
+            <p id="modalDesc" style="font-size: 12px; color: #4b5563; margin-bottom: 14px;">Connecting to third-party vendor API...</p>
+            <button class="btn" onclick="closeService()">Process & Earn Commission</button>
+        </div>
+    </div>
+
+    <script>
+        window.Telegram.WebApp.expand();
+        let currentWallet = 12890.00;
+
+        function loginSuccess() {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+        }
+
+        function logoutApp() {
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'block';
+        }
+
+        let pendingCommission = 0;
+
+        function triggerApiAction(apiName, commissionAmt) {
+            pendingCommission = commissionAmt;
+            document.getElementById('modalTitle').innerText = apiName;
+            document.getElementById('modalDesc').innerText = "API endpoint linked. Successful transaction will credit commission of +₹" + commissionAmt + " instantly to your wallet.";
+            document.getElementById('serviceModal').style.display = 'flex';
+        }
+
+        function closeService() {
+            if(pendingCommission > 0) {
+                currentWallet += pendingCommission;
+                document.getElementById('walletBalance').innerText = "₹" + currentWallet.toFixed(2);
+                alert("Transaction successful! Commission added: ₹" + pendingCommission);
+            }
+            document.getElementById('serviceModal').style.display = 'none';
+        }
+
+        function openRechargeModal() {
+            document.getElementById('rechMobile').value = '';
+            document.getElementById('rechAmount').value = '';
+            document.getElementById('rechStatus').innerText = '';
+            document.getElementById('rechargeModal').style.display = 'flex';
+        }
+
+        function closeRechargeModal() {
+            document.getElementById('rechargeModal').style.display = 'none';
+        }
+
+        function processRecharge() {
+            let mob = document.getElementById('rechMobile').value;
+            let amt = parseFloat(document.getElementById('rechAmount').value);
+            let op = document.getElementById('rechOperator').value;
+
+            if(mob.length < 10 || isNaN(amt) || amt <= 0) {
+                alert("Please enter valid mobile number and amount!");
+                return;
+            }
+
+            document.getElementById('rechStatus').innerText = "Connecting to " + op + " Gateway API...";
+            
+            setTimeout(() => {
+                let commission = parseFloat((amt * 0.025).toFixed(2)); // 2.5% commission
+                currentWallet += commission;
+                document.getElementById('walletBalance').innerText = "₹" + currentWallet.toFixed(2);
+                document.getElementById('rechStatus').innerText = "Recharge Successful! Commission Added: +₹" + commission;
+                
+                setTimeout(() => {
+                    closeRechargeModal();
+                    alert("Recharge of ₹" + amt + " for " + mob + " completed successfully via API! Commission ₹" + commission + " credited.");
+                }, 1000);
+            }, 1200);
+        }
+    </script>
+</body>
+                </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omnipay SuperApp - B2B Commission API</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
