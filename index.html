@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omnipay SuperApp</title>
+    <title>Omnipay SuperApp - B2B Commission API</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
@@ -13,9 +13,8 @@
         .btn { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .app-view { display: none; max-width: 400px; margin: 0 auto; }
         
-        .wallet-box { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white; padding: 16px; border-radius: 14px; margin: 12px 0; text-align: left; }
+        .wallet-box { background: linear-gradient(135deg, #047857, #059669); color: white; padding: 16px; border-radius: 14px; margin: 12px 0; text-align: left; }
         
-        /* Payment Gateway / Transfer Grid */
         .pay-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: white; padding: 14px 8px; border-radius: 14px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .pay-item { text-align: center; cursor: pointer; }
         .pay-item span { font-size: 22px; display: block; margin-bottom: 4px; }
@@ -24,9 +23,10 @@
         .section-title { font-size: 13px; font-weight: 600; color: #4b5563; margin: 14px 0 8px 0; text-align: left; }
         
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .grid-item { background: white; padding: 12px 4px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+        .grid-item { background: white; padding: 12px 4px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04); position: relative; }
         .grid-item span { font-size: 20px; display: block; margin-bottom: 4px; }
         .grid-item p { font-size: 10px; color: #374151; font-weight: 500; }
+        .commission-badge { position: absolute; top: 2px; right: 2px; background: #dcfce7; color: #166534; font-size: 8px; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
 
         /* Popup Modal */
         .popup-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
@@ -35,78 +35,85 @@
 </head>
 <body>
 
+    <!-- 1. LOGIN SCREEN -->
     <div id="loginBox" class="card">
-        <h2>Omnipay Login</h2>
+        <h2>Omnipay Merchant</h2>
         <input type="tel" placeholder="Mobile Number" id="mob">
-        <input type="password" placeholder="PIN / Password" id="pwd">
-        <button class="btn" onclick="loginSuccess()">Login / Fingerprint</button>
+        <input type="password" placeholder="API Secret / PIN" id="pwd">
+        <button class="btn" onclick="loginSuccess()">Merchant Login</button>
     </div>
 
+    <!-- 2. MAIN APP DASHBOARD -->
     <div id="mainApp" class="app-view">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="color: #2563eb; font-size: 17px;">Omnipay SuperApp</h2>
+            <h2 style="color: #059669; font-size: 17px;">Omnipay Partner Portal</h2>
             <button onclick="logoutApp()" style="background: #fee2e2; color: #dc2626; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">Logout</button>
         </div>
 
         <div class="wallet-box">
-            <p style="font-size: 11px; opacity: 0.9;">Wallet & Gateway Balance</p>
-            <h1 style="font-size: 24px; margin-top: 4px;">₹12,450.00</h1>
+            <p style="font-size: 11px; opacity: 0.9;">Main Wallet & Commission Earned</p>
+            <h1 style="font-size: 24px; margin-top: 4px;" id="walletBalance">₹12,450.00</h1>
+            <p style="font-size: 10px; margin-top: 4px; color: #d1fae5;">⚡ Commission API Connected: Active</p>
         </div>
 
+        <!-- Quick Actions -->
         <div class="pay-grid">
-            <div class="pay-item" onclick="openService('Scan & Pay (QR Code Scanner)')"><span>📷</span><p>Scan & Pay</p></div>
-            <div class="pay-item" onclick="openService('To Mobile / Contact Transfer')"><span>👤</span><p>To Contact</p></div>
-            <div class="pay-item" onclick="openService('Bank / UPI ID Transfer')"><span>🏦</span><p>Bank/UPI</p></div>
-            <div class="pay-item" onclick="openService('Refer & Earn ₹100')"><span>🎁</span><p>Refer & Earn</p></div>
+            <div class="pay-item" onclick="triggerApiAction('Scan & Pay API', 0)"><span>📷</span><p>Scan & Pay</p></div>
+            <div class="pay-item" onclick="triggerApiAction('Contact Payout API', 0)"><span>👤</span><p>To Contact</p></div>
+            <div class="pay-item" onclick="triggerApiAction('Bank payout API', 0)"><span>🏦</span><p>Bank/UPI</p></div>
+            <div class="pay-item" onclick="triggerApiAction('Referral Commission', 50)"><span>🎁</span><p>Refer & Earn</p></div>
         </div>
 
+        <!-- Rewards & Gold API Banners -->
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <div onclick="openService('Rewards & Scratch Cards')" style="flex: 1; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px; border-radius: 10px; cursor: pointer; text-align: left;">
+            <div onclick="triggerApiAction('Scratch Card Bonus', 25)" style="flex: 1; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px; border-radius: 10px; cursor: pointer; text-align: left;">
                 <h4 style="font-size: 12px;">🎁 Rewards</h4>
-                <p style="font-size: 10px; opacity: 0.9;">3 Cards Waiting</p>
+                <p style="font-size: 10px; opacity: 0.9;">Earn Cashbacks</p>
             </div>
-            <div onclick="openService('Gold & Silver Rates: Gold ₹7,150/g | Silver ₹92/g')" style="flex: 1; background: white; padding: 12px; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); text-align: left;">
-                <h4 style="font-size: 12px; color: #111827;">🪙 Gold Live</h4>
-                <p style="font-size: 10px; color: #6b7280;" id="goldText">₹7,150/g</p>
+            <div onclick="triggerApiAction('Gold Bullion API', 0)" style="flex: 1; background: white; padding: 12px; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); text-align: left;">
+                <h4 style="font-size: 12px; color: #111827;">🪙 Gold Live API</h4>
+                <p style="font-size: 10px; color: #6b7280;">₹7,150/g</p>
             </div>
         </div>
 
-        <div class="section-title">Recharges & Bills</div>
+        <!-- Services with Commission Badges -->
+        <div class="section-title">Recharges & Bills (Commission Enabled)</div>
         <div class="grid-4">
-            <div class="grid-item" onclick="openService('Mobile Recharge')"><span>📱</span><p>Recharge</p></div>
-            <div class="grid-item" onclick="openService('EB Bill Payment')"><span>💡</span><p>EB Bill</p></div>
-            <div class="grid-item" onclick="openService('DTH Recharge')"><span>📺</span><p>DTH</p></div>
-            <div class="grid-item" onclick="openService('Pharmacy Order')"><span>💊</span><p>Pharmacy</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Mobile Recharge API', 15)"><span class="commission-badge">+2.5%</span><span>📱</span><p>Recharge</p></div>
+            <div class="grid-item" onclick="triggerApiAction('BBPS Electricity API', 10)"><span class="commission-badge">+₹2</span><span>💡</span><p>EB Bill</p></div>
+            <div class="grid-item" onclick="triggerApiAction('DTH Recharge API', 12)"><span class="commission-badge">+3%</span><span>📺</span><p>DTH</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Pharmacy API', 40)"><span class="commission-badge">+5%</span><span>💊</span><p>Pharmacy</p></div>
         </div>
 
-        <div class="section-title">Travel & Tickets</div>
+        <div class="section-title">Travel & Ticketing APIs</div>
         <div class="grid-4">
-            <div class="grid-item" onclick="openService('Bus Ticket Booking')"><span>🚌</span><p>Bus</p></div>
-            <div class="grid-item" onclick="openService('Train Ticket Booking')"><span>🚆</span><p>Train</p></div>
-            <div class="grid-item" onclick="openService('Hotel Booking')"><span>🏨</span><p>Hotel</p></div>
-            <div class="grid-item" onclick="openService('Movie Ticket Booking')"><span>🎟️</span><p>Movies</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Bus Booking API', 50)"><span class="commission-badge">+₹50</span><span>🚌</span><p>Bus</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Train IRCTC API', 30)"><span class="commission-badge">+₹20</span><span>🚆</span><p>Train</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Hotel Booking API', 120)"><span class="commission-badge">+₹100</span><span>🏨</span><p>Hotel</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Movie Booking API', 20)"><span class="commission-badge">+₹10</span><span>🎟️</span><p>Movies</p></div>
         </div>
 
-        <div class="section-title">Financial & Loans</div>
+        <div class="section-title">Financial & Loan APIs</div>
         <div class="grid-4">
-            <div class="grid-item" onclick="openService('Loan Repayment')"><span>💳</span><p>Loan Repay</p></div>
-            <div class="grid-item" onclick="openService('Digital Gold')"><span>🪙</span><p>Digi Gold</p></div>
-            <div class="grid-item" onclick="openService('Investments')"><span>📊</span><p>Invest</p></div>
-            <div class="grid-item" onclick="openService('Insurance')"><span>🛡️</span><p>Insurance</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Loan Repayment API', 25)"><span class="commission-badge">+₹15</span><span>💳</span><p>Loan Repay</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Digital Gold API', 15)"><span class="commission-badge">+1%</span><span>🪙</span><p>Digi Gold</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Mutual Fund API', 50)"><span class="commission-badge">+₹40</span><span>📊</span><p>Invest</p></div>
+            <div class="grid-item" onclick="triggerApiAction('Insurance API', 150)"><span class="commission-badge">+₹150</span><span>🛡️</span><p>Insurance</p></div>
         </div>
     </div>
 
+    <!-- POPUP MODAL -->
     <div id="serviceModal" class="popup-modal">
         <div class="popup-content">
-            <h3 id="modalTitle" style="color: #2563eb; margin-bottom: 8px; font-size: 16px;">Service</h3>
-            <p id="modalDesc" style="font-size: 12px; color: #4b5563; margin-bottom: 14px;">Gateway connected successfully!</p>
-            <input type="text" id="modalInput" placeholder="Enter amount or details..." style="display:none;">
-            <button class="btn" onclick="closeService()">Proceed / Close</button>
+            <h3 id="modalTitle" style="color: #059669; margin-bottom: 8px; font-size: 16px;">API Gateway</h3>
+            <p id="modalDesc" style="font-size: 12px; color: #4b5563; margin-bottom: 14px;">Connecting to third-party vendor API...</p>
+            <button class="btn" style="background: #059669;" onclick="closeService()">Process & Earn Commission</button>
         </div>
     </div>
 
     <script>
         window.Telegram.WebApp.expand();
+        let currentWallet = 12450.00;
 
         function loginSuccess() {
             document.getElementById('loginBox').style.display = 'none';
@@ -118,16 +125,24 @@
             document.getElementById('loginBox').style.display = 'block';
         }
 
-        function openService(serviceName) {
-            document.getElementById('modalTitle').innerText = serviceName;
-            document.getElementById('modalDesc').innerText = "Connected to Secure Payment Gateway for " + serviceName;
+        let pendingCommission = 0;
+
+        function triggerApiAction(apiName, commissionAmt) {
+            pendingCommission = commissionAmt;
+            document.getElementById('modalTitle').innerText = apiName;
+            document.getElementById('modalDesc').innerText = "API endpoint linked. Successful transaction will credit commission of +" + commissionAmt + " instantly to your wallet.";
             document.getElementById('serviceModal').style.display = 'flex';
         }
 
         function closeService() {
+            if(pendingCommission > 0) {
+                currentWallet += pendingCommission;
+                document.getElementById('walletBalance').innerText = "₹" + currentWallet.toFixed(2);
+                alert("Transaction successful! Commission added: ₹" + pendingCommission);
+            }
             document.getElementById('serviceModal').style.display = 'none';
         }
     </script>
 </body>
-                </html>
-                
+                                                                                        </html>
+                                                                                        
