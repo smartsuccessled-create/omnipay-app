@@ -3,234 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omnipay SuperApp</title>
+    <title>Omnipay</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        body {
-            background-color: #f4f6f8;
-            color: #1f2937;
-            padding-bottom: 70px;
-        }
-        .page { display: none; padding: 16px; }
-        .page.active { display: block; }
-
-        /* Auth Box */
-        .auth-box {
-            max-width: 340px;
-            margin: 60px auto;
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        .auth-box h2 { color: #111827; margin-bottom: 20px; font-size: 20px; }
-        .box-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-        }
-        .btn-main {
-            width: 100%;
-            padding: 12px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 6px;
-        }
-
-        /* App Header */
-        .top-header {
-            background: #ffffff;
-            padding: 14px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        /* Wallet Card */
-        .wallet-box {
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
-            color: white;
-            padding: 18px;
-            border-radius: 14px;
-            margin: 14px 0;
-        }
-        .wallet-box h3 { font-size: 12px; opacity: 0.9; font-weight: 400; }
-        .wallet-box h1 { font-size: 24px; font-weight: 700; margin-top: 4px; }
-
-        /* Grids */
-        .heading { font-size: 13px; font-weight: 600; color: #4b5563; margin: 16px 0 8px 0; }
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-        .grid-item {
-            background: #ffffff;
-            padding: 12px 4px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        }
-        .grid-item span { font-size: 20px; display: block; margin-bottom: 4px; }
-        .grid-item p { font-size: 10px; color: #374151; font-weight: 500; }
-
-        /* Info Card */
-        .card-row {
-            background: #ffffff;
-            padding: 12px 14px;
-            border-radius: 10px;
-            margin-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        }
-
-        /* Bottom Nav */
-        .nav-bar {
-            position: fixed;
-            bottom: 0; left: 0;
-            width: 100%;
-            background: #ffffff;
-            border-top: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 100;
-        }
-        .nav-btn {
-            background: none;
-            border: none;
-            text-align: center;
-            color: #9ca3af;
-            font-size: 10px;
-            cursor: pointer;
-        }
-        .nav-btn.active { color: #2563eb; font-weight: 600; }
-        .nav-btn span { display: block; font-size: 18px; }
+        body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 16px; color: #333; }
+        .card { background: #fff; padding: 20px; border-radius: 12px; max-width: 320px; margin: 40px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .app-view { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- 1. LOGIN SCREEN -->
-    <div id="loginPage" class="page active">
-        <div class="auth-box">
-            <h2>Omnipay Login</h2>
-            <input type="tel" id="phone" class="box-input" placeholder="Mobile Number">
-            <input type="password" id="pin" class="box-input" placeholder="Password / PIN">
-            <button class="btn-main" onclick="openDashboard()">Login</button>
-            <button class="btn-main" style="background: #059669;" onclick="openDashboard()">🔒 Fingerprint Unlock</button>
-        </div>
+    <!-- Login Box -->
+    <div id="loginBox" class="card">
+        <h2>Omnipay Login</h2>
+        <input type="tel" placeholder="Mobile Number" id="mob">
+        <input type="password" placeholder="PIN / Password" id="pwd">
+        <button onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('mainApp').style.display='block';">Login / Fingerprint</button>
     </div>
 
-    <!-- 2. DASHBOARD SCREEN -->
-    <div id="dashboardPage" class="page">
-        <div class="top-header">
-            <div>
-                <h3 style="font-size: 15px; font-weight: 600;" id="userTitle">Hello, Aruvi</h3>
-                <p style="font-size: 10px; color: #6b7280;">Secure SuperApp</p>
-            </div>
-            <button onclick="logoutApp()" style="background: #fee2e2; color: #dc2626; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Logout</button>
+    <!-- Main App View -->
+    <div id="mainApp" class="app-view">
+        <h2 style="color: #2563eb;">Omnipay SuperApp</h2>
+        <div style="background: #2563eb; color: white; padding: 15px; border-radius: 10px; margin: 15px 0;">
+            Wallet Balance: <b>₹12,450.00</b>
+        </div>
+        
+        <h3>Services</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
+            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">📱 Recharge</div>
+            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">💡 EB Bill</div>
+            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">🚌 Bus / Train</div>
+            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center;">🪙 Gold Live</div>
         </div>
 
-        <div style="padding: 0 4px;">
-            <!-- Wallet -->
-            <div class="wallet-box">
-                <h3>Main Wallet Balance</h3>
-                <h1>₹12,450.00</h1>
-            </div>
-
-            <!-- Rewards -->
-            <div class="card-row" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
-                <div>
-                    <h4 style="font-size: 12px;">🎁 Rewards & Scratch Cards</h4>
-                    <p style="font-size: 10px; opacity: 0.9;">3 Scratch cards available</p>
-                </div>
-                <button style="background: white; color: #d97706; border: none; padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; cursor: pointer;">Claim</button>
-            </div>
-
-            <!-- Gold & Silver Live API -->
-            <div class="card-row">
-                <div>
-                    <h4 style="font-size: 12px; color: #111827;">🪙 Gold & Silver Live</h4>
-                    <p style="font-size: 10px; color: #6b7280;" id="goldRateText">Gold: ₹7,150/g | Silver: ₹92/g</p>
-                </div>
-                <span style="font-size: 18px;">📈</span>
-            </div>
-
-            <!-- Services Row 1 -->
-            <div class="heading">Recharges & Bills</div>
-            <div class="grid-4">
-                <div class="grid-item"><span>📱</span><p>Recharge</p></div>
-                <div class="grid-item"><span>💡</span><p>EB Bill</p></div>
-                <div class="grid-item"><span>📺</span><p>DTH</p></div>
-                <div class="grid-item"><span>💊</span><p>Pharmacy</p></div>
-            </div>
-
-            <!-- Services Row 2 -->
-            <div class="heading">Travel & Tickets</div>
-            <div class="grid-4">
-                <div class="grid-item"><span>🚌</span><p>Bus</p></div>
-                <div class="grid-item"><span>🚆</span><p>Train</p></div>
-                <div class="grid-item"><span>🏨</span><p>Hotel</p></div>
-                <div class="grid-item"><span>🎟️</span><p>Movies</p></div>
-            </div>
-
-            <!-- Services Row 3 -->
-            <div class="heading">Financial Services</div>
-            <div class="grid-4">
-                <div class="grid-item"><span>💳</span><p>Loan Repay</p></div>
-                <div class="grid-item"><span>🪙</span><p>Digi Gold</p></div>
-                <div class="grid-item"><span>📊</span><p>Invest</p></div>
-                <div class="grid-item"><span>🛡️</span><p>Insurance</p></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <div class="nav-bar">
-        <button class="nav-btn active"><span>🏠</span>Home</button>
-        <button class="nav-btn"><span>🎁</span>Rewards</button>
-        <button class="nav-btn"><span>📜</span>History</button>
-        <button class="nav-btn"><span>👤</span>Profile</button>
+        <button style="background: #dc2626; margin-top: 20px;" onclick="document.getElementById('mainApp').style.display='none'; document.getElementById('loginBox').style.display='block';">Logout</button>
     </div>
 
     <script>
-        // Telegram WebApp Setup
-        let tg = window.Telegram.WebApp;
-        if(tg) {
-            tg.expand();
-            if(tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) {
-                document.getElementById('userTitle').innerText = "Hello, " + tg.initDataUnsafe.user.first_name;
-            }
-        }
-
-        function openDashboard() {
-            document.getElementById('loginPage').classList.remove('active');
-            document.getElementById('dashboardPage').classList.add('active');
-        }
-
-        function logoutApp() {
-            document.getElementById('dashboardPage').classList.remove('active');
-            document.getElementById('loginPage').classList.add('active');
-        }
+        window.Telegram.WebApp.expand();
     </script>
 </body>
 </html>
