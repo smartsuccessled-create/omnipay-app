@@ -17,29 +17,30 @@
             color: #1f2937;
             padding-bottom: 70px;
         }
-        .screen { display: none; padding: 16px; }
-        .screen.active { display: block; }
-        
-        /* Auth Styles */
-        .auth-container {
-            max-width: 360px;
-            margin: 40px auto;
+        .page { display: none; padding: 16px; }
+        .page.active { display: block; }
+
+        /* Auth Box */
+        .auth-box {
+            max-width: 340px;
+            margin: 60px auto;
             background: #ffffff;
             padding: 24px;
             border-radius: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             text-align: center;
         }
-        .auth-container h2 { margin-bottom: 16px; color: #111827; }
-        .input-field {
+        .auth-box h2 { color: #111827; margin-bottom: 20px; font-size: 20px; }
+        .box-input {
             width: 100%;
             padding: 12px;
             margin-bottom: 12px;
             border: 1px solid #d1d5db;
             border-radius: 8px;
             font-size: 14px;
+            outline: none;
         }
-        .primary-btn {
+        .btn-main {
             width: 100%;
             padding: 12px;
             background: #2563eb;
@@ -49,65 +50,61 @@
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
-        /* Dashboard Header */
-        .header {
+        /* App Header */
+        .top-header {
             background: #ffffff;
-            padding: 16px;
+            padding: 14px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e5e7eb;
         }
-        .balance-card {
+        
+        /* Wallet Card */
+        .wallet-box {
             background: linear-gradient(135deg, #1d4ed8, #2563eb);
             color: white;
             padding: 18px;
-            border-radius: 16px;
-            margin: 16px 0;
+            border-radius: 14px;
+            margin: 14px 0;
         }
-        .balance-card h3 { font-size: 13px; opacity: 0.9; font-weight: 400; }
-        .balance-card h1 { font-size: 26px; font-weight: 700; margin-top: 4px; }
+        .wallet-box h3 { font-size: 12px; opacity: 0.9; font-weight: 400; }
+        .wallet-box h1 { font-size: 24px; font-weight: 700; margin-top: 4px; }
 
-        /* Services Grid */
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #4b5563;
-            margin: 16px 0 10px 0;
-        }
-        .services-grid {
+        /* Grids */
+        .heading { font-size: 13px; font-weight: 600; color: #4b5563; margin: 16px 0 8px 0; }
+        .grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
         }
-        .service-item {
+        .grid-item {
             background: #ffffff;
             padding: 12px 4px;
-            border-radius: 12px;
+            border-radius: 10px;
             text-align: center;
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-            cursor: pointer;
         }
-        .service-item span { font-size: 22px; display: block; margin-bottom: 4px; }
-        .service-item p { font-size: 10px; color: #374151; font-weight: 500; }
+        .grid-item span { font-size: 20px; display: block; margin-bottom: 4px; }
+        .grid-item p { font-size: 10px; color: #374151; font-weight: 500; }
 
-        /* Gold & Silver / Rewards Cards */
-        .info-card {
+        /* Info Card */
+        .card-row {
             background: #ffffff;
-            padding: 14px;
-            border-radius: 12px;
-            margin-top: 12px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-top: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
 
         /* Bottom Nav */
-        .bottom-nav {
+        .nav-bar {
             position: fixed;
             bottom: 0; left: 0;
             width: 100%;
@@ -118,124 +115,121 @@
             padding: 10px 0;
             z-index: 100;
         }
-        .nav-item {
+        .nav-btn {
+            background: none;
+            border: none;
             text-align: center;
-            text-decoration: none;
             color: #9ca3af;
             font-size: 10px;
             cursor: pointer;
         }
-        .nav-item.active { color: #2563eb; }
-        .nav-item span { display: block; font-size: 18px; }
+        .nav-btn.active { color: #2563eb; font-weight: 600; }
+        .nav-btn span { display: block; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <!-- 1. AUTH SCREEN (Signup / Login) -->
-    <div id="authScreen" class="screen active">
-        <div class="auth-container">
-            <h2>Omnipay Welcome</h2>
-            <input type="text" id="mobileInput" class="input-field" placeholder="Enter Mobile Number">
-            <input type="password" id="passInput" class="input-field" placeholder="Enter Password / PIN">
-            <button class="primary-btn" onclick="loginApp()">Login / Register</button>
-            <p style="font-size: 12px; color: #6b7280; margin-top: 12px;">Or Quick Login via Biometric</p>
-            <button class="primary-btn" style="background: #059669;" onclick="loginApp()">🔒 Fingerprint Login</button>
+    <!-- 1. LOGIN SCREEN -->
+    <div id="loginPage" class="page active">
+        <div class="auth-box">
+            <h2>Omnipay Login</h2>
+            <input type="tel" id="phone" class="box-input" placeholder="Mobile Number">
+            <input type="password" id="pin" class="box-input" placeholder="Password / PIN">
+            <button class="btn-main" onclick="openDashboard()">Login</button>
+            <button class="btn-main" style="background: #059669;" onclick="openDashboard()">🔒 Fingerprint Unlock</button>
         </div>
     </div>
 
-    <!-- 2. MAIN DASHBOARD SCREEN -->
-    <div id="mainScreen" class="screen">
-        <div class="header">
+    <!-- 2. DASHBOARD SCREEN -->
+    <div id="dashboardPage" class="page">
+        <div class="top-header">
             <div>
-                <h2 id="username" style="font-size: 16px; font-weight: 600;">Hello, Aruvi</h2>
-                <p style="font-size: 11px; color: #6b7280;">Secure Payments & Services</p>
+                <h3 style="font-size: 15px; font-weight: 600;" id="userTitle">Hello, Aruvi</h3>
+                <p style="font-size: 10px; color: #6b7280;">Secure SuperApp</p>
             </div>
-            <button onclick="logout()" style="background: #fee2e2; color: #dc2626; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Logout</button>
+            <button onclick="logoutApp()" style="background: #fee2e2; color: #dc2626; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Logout</button>
         </div>
 
         <div style="padding: 0 4px;">
-            <!-- Wallet Balance -->
-            <div class="balance-card">
-                <h3>Omnipay Balance</h3>
+            <!-- Wallet -->
+            <div class="wallet-box">
+                <h3>Main Wallet Balance</h3>
                 <h1>₹12,450.00</h1>
             </div>
 
-            <!-- Rewards Section -->
-            <div class="info-card" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+            <!-- Rewards -->
+            <div class="card-row" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
                 <div>
-                    <h4 style="font-size: 13px;">🎁 Rewards & Scratch Cards</h4>
-                    <p style="font-size: 11px; opacity: 0.9;">You have 3 scratch cards waiting!</p>
+                    <h4 style="font-size: 12px;">🎁 Rewards & Scratch Cards</h4>
+                    <p style="font-size: 10px; opacity: 0.9;">3 Scratch cards available</p>
                 </div>
-                <button style="background: white; color: #d97706; border: none; padding: 6px 10px; border-radius: 6px; font-weight: 600; font-size: 11px;">Claim</button>
+                <button style="background: white; color: #d97706; border: none; padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; cursor: pointer;">Claim</button>
             </div>
 
-            <!-- Gold & Silver Live Rates API Section -->
-            <div class="info-card">
+            <!-- Gold & Silver Live API -->
+            <div class="card-row">
                 <div>
-                    <h4 style="font-size: 13px; color: #111827;">🪙 Gold & Silver Live</h4>
-                    <p style="font-size: 11px; color: #6b7280;" id="metalRates">Loading live rates...</p>
+                    <h4 style="font-size: 12px; color: #111827;">🪙 Gold & Silver Live</h4>
+                    <p style="font-size: 10px; color: #6b7280;" id="goldRateText">Gold: ₹7,150/g | Silver: ₹92/g</p>
                 </div>
-                <span style="font-size: 20px;">📈</span>
+                <span style="font-size: 18px;">📈</span>
             </div>
 
-            <!-- Bill Payments & Recharges -->
-            <div class="section-title">Recharge & Bills</div>
-            <div class="services-grid">
-                <div class="service-item"><span>📱</span><p>Recharge</p></div>
-                <div class="service-item"><span>💡</span><p>EB Bill</p></div>
-                <div class="service-item"><span>📺</span><p>DTH</p></div>
-                <div class="service-item"><span>💊</span><p>Pharmacy</p></div>
+            <!-- Services Row 1 -->
+            <div class="heading">Recharges & Bills</div>
+            <div class="grid-4">
+                <div class="grid-item"><span>📱</span><p>Recharge</p></div>
+                <div class="grid-item"><span>💡</span><p>EB Bill</p></div>
+                <div class="grid-item"><span>📺</span><p>DTH</p></div>
+                <div class="grid-item"><span>💊</span><p>Pharmacy</p></div>
             </div>
 
-            <!-- Travel & Tickets -->
-            <div class="section-title">Travel & Entertainment</div>
-            <div class="services-grid">
-                <div class="service-item"><span>🚌</span><p>Bus</p></div>
-                <div class="service-item"><span>🚆</span><p>Train</p></div>
-                <div class="service-item"><span>🏨</span><p>Hotel</p></div>
-                <div class="service-item"><span>🎟️</span><p>Movies</p></div>
+            <!-- Services Row 2 -->
+            <div class="heading">Travel & Tickets</div>
+            <div class="grid-4">
+                <div class="grid-item"><span>🚌</span><p>Bus</p></div>
+                <div class="grid-item"><span>🚆</span><p>Train</p></div>
+                <div class="grid-item"><span>🏨</span><p>Hotel</p></div>
+                <div class="grid-item"><span>🎟️</span><p>Movies</p></div>
             </div>
 
-            <!-- Financial Services -->
-            <div class="section-title">Financial Services</div>
-            <div class="services-grid">
-                <div class="service-item"><span>💳</span><p>Loan Repay</p></div>
-                <div class="service-item"><span>🪙</span><p>Digital Gold</p></div>
-                <div class="service-item"><span>📊</span><p>Investments</p></div>
-                <div class="service-item"><span>🛡️</span><p>Insurance</p></div>
+            <!-- Services Row 3 -->
+            <div class="heading">Financial Services</div>
+            <div class="grid-4">
+                <div class="grid-item"><span>💳</span><p>Loan Repay</p></div>
+                <div class="grid-item"><span>🪙</span><p>Digi Gold</p></div>
+                <div class="grid-item"><span>📊</span><p>Invest</p></div>
+                <div class="grid-item"><span>🛡️</span><p>Insurance</p></div>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <div class="bottom-nav">
-        <a class="nav-item active"><span>🏠</span>Home</a>
-        <a class="nav-item"><span>🎁</span>Rewards</a>
-        <a class="nav-item"><span>📜</span>History</a>
-        <a class="nav-item"><span>👤</span>Profile</a>
+    <!-- Bottom Navigation -->
+    <div class="nav-bar">
+        <button class="nav-btn active"><span>🏠</span>Home</button>
+        <button class="nav-btn"><span>🎁</span>Rewards</button>
+        <button class="nav-btn"><span>📜</span>History</button>
+        <button class="nav-btn"><span>👤</span>Profile</button>
     </div>
 
     <script>
+        // Telegram WebApp Setup
         let tg = window.Telegram.WebApp;
-        tg.expand();
-
-        function loginApp() {
-            document.getElementById('authScreen').classList.remove('active');
-            document.getElementById('mainScreen').classList.add('active');
-            fetchGoldSilverRates();
+        if(tg) {
+            tg.expand();
+            if(tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) {
+                document.getElementById('userTitle').innerText = "Hello, " + tg.initDataUnsafe.user.first_name;
+            }
         }
 
-        function logout() {
-            document.getElementById('mainScreen').classList.remove('active');
-            document.getElementById('authScreen').classList.add('active');
+        function openDashboard() {
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('dashboardPage').classList.add('active');
         }
 
-        // Simulating Gold & Silver Live API Fetch
-        function fetchGoldSilverRates() {
-            // Mocking live API data for demonstration
-            setTimeout(() => {
-                document.getElementById('metalRates').innerText = "Gold: ₹7,150/g | Silver: ₹92/g";
-            }, 500);
+        function logoutApp() {
+            document.getElementById('dashboardPage').classList.remove('active');
+            document.getElementById('loginPage').classList.add('active');
         }
     </script>
 </body>
